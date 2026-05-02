@@ -1,9 +1,10 @@
 import streamlit as st
 from openai import OpenAI
 
-client = OpenAI()
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 st.title("AI Text Improver")
+st.write("Paste your text below and choose a style. The AI will rewrite it for you.")
 
 user_input = st.text_area("Write something:")
 
@@ -18,11 +19,12 @@ if st.button("Improve"):
     else:
         prompt = f"Rewrite this text in a {tone.lower()} way: {user_input}"
 
-        response = client.chat.completions.create(
-            model="gpt-4.1-mini",
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
-        )
+        with st.spinner("Improving your text..."):
+            response = client.chat.completions.create(
+                model="gpt-4.1-mini",
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
 
-        st.write(response.choices[0].message.content)
+        st.success(response.choices[0].message.content)
